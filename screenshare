@@ -1,0 +1,19 @@
+#!/bin/bash
+# Usage: screenshare <group>
+
+GROUP=`id -g`
+if [ ! -z $1 ]; then
+	GROUP=$1
+fi
+
+RC_FILE=`mktemp`
+
+echo "Instruct other users to run screen -x $USER/share"
+sleep 4
+echo "multiuser on" > $RC_FILE
+
+for user in `getent group $GROUP | cut -d ':' -f 4 | sed "s/,/ /g"`; do 
+	echo "acladd $user" >> $RC_FILE
+done
+
+screen -c $RC_FILE -S share ; rm $RC_FILE
